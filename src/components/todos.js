@@ -8,7 +8,7 @@ class Todos extends React.Component {
                className="todoItem"
                key={todo.id}
                onClick={() => {
-                  console.log(todo.id);
+                  this.setState({ singleTodo: todo.title });
                }}
             >
                {todo.title}
