@@ -1,13 +1,9 @@
 import React from "react";
 import Loading from "./components/loading";
 import Todos from "./components/todos";
+import BackButton from "./components/backbutton";
 
 class App extends React.Component {
-   // state you should have
-   // todos
-   // singleTodo
-   // loading
-   // loadingMessage = 'app is loading...' -> pass as props to loading component.
    constructor(props) {
       super(props);
       this.state = {
@@ -16,6 +12,8 @@ class App extends React.Component {
          loading: true,
          loadingMessage: "Page is loading..",
       };
+
+      this.toggleOff = this.toggleOff.bind(this);
    }
 
    componentDidMount() {
@@ -24,6 +22,10 @@ class App extends React.Component {
          .then((data) => {
             this.setState({ todos: data, loading: false });
          });
+   }
+
+   toggleOff() {
+      this.setState({ singleTodo: null });
    }
 
    // Components
@@ -51,12 +53,36 @@ class App extends React.Component {
    // Conditionaly render Todos -> TodoItem or singleTodo
 
    render() {
+      const updateToSingle = (e) => {
+         fetch(`https://jsonplaceholder.typicode.com/todos/${e.target.id}`)
+            .then((res) => res.json())
+            .then((data) => this.setState({ singleTodo: data }));
+      };
       if (this.state.loading) {
          return <Loading loadingMessage={this.state.loadingMessage} />;
       } else {
-         return <Todos todos={this.state.todos} />;
+         if (this.state.singleTodo)
+            return (
+               <div className="todoItem" key={this.state.singleTodo.id}>
+                  {this.state.singleTodo.title}
+                  <BackButton toggleOff={this.toggleOff} />
+               </div>
+            );
+         else
+            return (
+               <Todos
+                  todos={this.state.todos}
+                  updateToSingle={updateToSingle}
+               />
+            );
       }
    }
 }
 
 export default App;
+
+// state you should have
+// todos
+// singleTodo
+// loading
+// loadingMessage = 'app is loading...' -> pass as props to loading component.
